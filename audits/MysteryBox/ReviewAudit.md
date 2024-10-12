@@ -1,3 +1,5 @@
+#L-01'MysteryBox::constructor()' has different rewards compared to 'MysteryBox::openBox()'#
+
 ## Summary
 
 En el  `MysteryBox::constructor()` hay unos valores definidos para cada premio en valor  de eth, que recibimos al abrir una caja que cuesta ether que el usuario compra.  Después hay discrepancia en la función `MysteryBox::openBox()`  porque el valor de los premios no son los mismos que los premios definidos en `MysteryBox::constructor()` .
@@ -111,4 +113,4 @@ rewardPool.push(Reward("Gold Coin", 0.5 ether));
         rewardPool.push(Reward("Bronze Coin", 0.1 ether));
         rewardPool.push(Reward("Coal", 0 ether));
 ```
-
+***
