@@ -1,4 +1,4 @@
-# L-01'MysteryBox::constructor()' tiene diferentes recompensas que la función 'MysteryBox::openBox()'
+# L-01`MysteryBox::constructor()` tiene diferentes recompensas que la función `MysteryBox::openBox()`
 
 ## Resumen
 
