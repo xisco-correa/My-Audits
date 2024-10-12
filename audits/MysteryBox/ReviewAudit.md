@@ -1,6 +1,6 @@
 ## Summary
 
-En el  `MysteryBox::constructor()` hay unos valores definidos para cada premio en valor  de eth, que recibimos al abrir una caja que cuesta ether que el usuario compra,  después hay discrepancia en la función `MysteryBox::openBox()`  porque el valor de los premios no son los mismos que los premios definidos en `MysteryBox::constructor()` .
+En el  `MysteryBox::constructor()` hay unos valores definidos para cada premio en valor  de eth, que recibimos al abrir una caja que cuesta ether que el usuario compra.  Después hay discrepancia en la función `MysteryBox::openBox()`  porque el valor de los premios no son los mismos que los premios definidos en `MysteryBox::constructor()` .
 
 ## Vulnerability Details
 
@@ -24,9 +24,9 @@ Como puedes ver en el `MysteryBox::constructor()` se pasan los valores de:
     }
 ```
 
-> [Link al código](https://github.com/xisco-correa/My-Audits/blob/main/audits/MysteryBox/MysteryBox.sol#L18-27)
+> [Link al código](https://github.com/xisco-correa/My-Audits/blob/main/audits/MysteryBox/MysteryBox.sol#L18-L27)
 
-La incorcondancia ocurre en una de las funciones del contrato `MysteryBox::openBox()` cuando al guardar los premios en `mapping(address => Reward[]) public rewardsOwned;` asigna un valor totalmente diferente para el premio ***SilverCoin*** dándole un nuevo valor de **0.25 ether** y a ***GoldCoin*** un  valor de **1 ether**.
+La incorcondancia ocurre en una de las funciones del contrato `MysteryBox::openBox()` cuando, al guardar los premios en `mapping(address => Reward[]) public rewardsOwned;` , asigna un valor totalmente diferente para el premio ***SilverCoin*** ,dándole un nuevo valor de **0.25 ether** y a ***GoldCoin*** un  valor de **1 ether**.
 
 ```Solidity
 Solidity
@@ -59,8 +59,8 @@ Solidity
 
 ## Impact
 
-Este malentendido puede hacer que los usuarios tenga una percepción errónea de cuales son los premios reales del contrato `MysteryBox`o que el dueño del contrato este repartiendo uno premios no deseados que pueden llevar a cabo la pérdida de fondos.
-Otro posible problema es una falta de actualización de los datos si un usuario cambia los valores del constructor estos no se actualizarían en la función `MysteryBox::openBox()` lo que hace que los parámetros del constructor que hacen referencia a los premiso queden en un estado inconsciente.
+Este malentendido puede hacer que los usuarios tenga una percepción errónea de cuales son los premios reales del contrato `MysteryBox` , o que el dueño del contrato este repartiendo  premios no deseados , lo que pueden llevar a cabo la pérdida de fondos.
+Otro posible problema es una falta de actualización de los datos si un usuario cambia los valores del constructor, estos no se actualizarían en la función `MysteryBox::openBox()` lo que hace que los parámetros del constructor que hacen referencia a los premios queden en un estado inconsciente.
 
 ## Tools Used
 
@@ -68,7 +68,7 @@ Revisión Manual.
 
 ## Recommendations
 
-Para que  `MysteryBox::constructor()` se puede dejar como está escrito y será el único lugar necesario donde actualizar las recompensas de los premios siempre que en la función \`MusteryBox::openBox se escriba de la siguiente manera.
+Para que  `MysteryBox::constructor()` se pueda dejar como está escrito y será el único lugar necesario donde actualizar las recompensas de los premios siempre que en la función \`MusteryBox::openBox se escriba de la siguiente manera.
 
 ```Solidity
 Solidity
@@ -97,7 +97,7 @@ function openBox() public {
     }
 ```
 
-De este manera a `mapping(address => Reward[]) public rewardsOwned;` que recopila las recompensas que el usuario va obteniendo se le introduce el valor `Reward[] public rewardPool;` apuntando al índice del premio correspondiente según se han guardado en el `MysteryBox::constructor()`.
+De este manera a `mapping(address => Reward[]) public rewardsOwned;`, que recopila las recompensas que el usuario va obteniendo ,se le introduce el valor `Reward[] public rewardPool;` apuntando al índice del premio correspondiente según se han guardado en el `MysteryBox::constructor()`.
 
 * Posición 0 del índice del array `Reward[] public rewardPool;` para ***GoldCoin***
 * Posición 1 del índice del array `Reward[] public rewardPool;` para ***Silver Coin***
@@ -111,3 +111,4 @@ rewardPool.push(Reward("Gold Coin", 0.5 ether));
         rewardPool.push(Reward("Bronze Coin", 0.1 ether));
         rewardPool.push(Reward("Coal", 0 ether));
 ```
+
