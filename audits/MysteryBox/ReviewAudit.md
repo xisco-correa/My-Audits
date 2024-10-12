@@ -125,5 +125,5 @@ function viewRewardsAvaiable(uint256 _indexReward)public view returns (string me
         return (avaiableReward.name, avaiableReward.value);
     }
 ```
-Esta función cuando le introduzcas el parámetro índice te devolverá el nombre y el premio asignado en wei, la información la obtiene de Reward[] public rewardPool;`
+Esta función cuando le introduzcas el parámetro índice te devolverá el nombre y el premio asignado en wei, la información la obtiene de `Reward[] public rewardPool;`
 ***
