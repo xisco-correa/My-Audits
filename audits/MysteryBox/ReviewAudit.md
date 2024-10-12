@@ -113,4 +113,17 @@ rewardPool.push(Reward("Gold Coin", 0.5 ether));
         rewardPool.push(Reward("Bronze Coin", 0.1 ether));
         rewardPool.push(Reward("Coal", 0 ether));
 ```
+
+## Checking the recommendation
+
+Si quieres verificar en tu contrato que los precios se han configurado de manera correcta puedes añadir esta función a `MysteryBox`:
+```
+Solidity
+function viewRewardsAvaiable(uint256 _indexReward)public view returns (string memory, uint256){
+        require(_indexReward < rewardPool.length, "there is no more prizes");
+        Reward memory avaiableReward = rewardPool[_indexReward];
+        return (avaiableReward.name, avaiableReward.value);
+    }
+```
+Esta función cuando le introduzcas el parámetro índice te devolverá el nombre y el premio asignado en wei, la información la obtiene de Reward[] public rewardPool;`
 ***
