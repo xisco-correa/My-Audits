@@ -92,6 +92,7 @@ constructor(string memory antiDefault_password) {
     }
 ```
 
+***
 # 02-.La función `PasswordStore::setNewPassword()` le falta requerimiento de owner
 
 ## Summary
