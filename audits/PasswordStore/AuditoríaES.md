@@ -1,4 +1,4 @@
-# La variable `string private s_password`se encuentra en estado de default
+# La variable `string private s_password` se encuentra en estado de default
 
 
 ## Summary
