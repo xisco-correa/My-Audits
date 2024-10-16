@@ -91,3 +91,72 @@ constructor(string memory antiDefault_password) {
         s_owner = msg.sender;
     }
 ```
+
+# 02-.La función `PasswordStore::setNewPassword()` le falta requerimiento de owner
+
+## Summary
+Según la lógica del contrato, solo el owner puede configurar la contraseña. El problema es que en`PasswordStore::setNewPassword()`, cualquiera puede llamar a esta función para configurarla.
+> [Link al código](https://github.com/xisco-correa/My-Audits/blob/main/audits/PasswordStore/PasswordStore.sol#L26-L29)
+
+## Vulnerability Details
+En la función `PasswordStore::setNewPassword()`: 
+
+```Solidity
+ function setPassword(string memory newPassword) external {
+        s_password = newPassword;
+        emit SetNetPassword();
+    }
+```
+Cualquier usuario llamando a esta función, configura la variable de estado `string private s_password;`
+
+
+## Impact
+
+Esto no debería ser así porque le contrato pierde la lógica donde solo el owner puede configurar una nueva contraseña, ya que si este guarda su contraseña, pero seguidamente otro usuario llama a esta función, la contraseña del owner será modificada.
+
+## PoC
+
+Ejecutamos una prueba test, donde el `user(2)` llama a la función sin ser el ***owner*** y consigue modificar la variable de estado `string private s_password;`
+
+```Solidity
+function setUp() public{    
+        user1 = address(1);
+        user2 = address(2);
+        
+        vm.prank(user1);
+        passwordStore = new PasswordStore();
+        
+    }
+
+    function testRandomUserCanSetPassword()public{
+        vm.startPrank(user2);
+        passwordStore.setPassword("hola");
+        vm.stopPrank();
+
+    }
+```
+ 
+## Recommended Mitigation
+
+Importar la librería `import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";`, de esta manera las funciones que requiran de permiso ***owner***, se podrá poner un modifier que será `onlyOwner`. Una vez hecho esto la función solo se podrá llamar por el `address` que ha desplegado el contrato.
+
+```Solidity
+constructor() Ownable(msg.sender){
+    }
+
+    /*
+     * @notice This function allows only the owner to set a new password.
+     * @param newPassword The new password to set.
+     */
+    function setPassword(string memory newPassword) external onlyOwner {
+        s_password = newPassword;
+        emit SetNetPassword();
+    }
+```
+Como puedes ver en el `PasswordStore::constructor()` pasa el `msg.sender`al constructor de `Ownable::constructor()`, para que en la función `PasswordStore::setPassword`  el modifier `onlyOwner` haga la función de solo poder ser llamado por el propietario.
+
+
+
+## Tools Used
+
+Revisión Manual.
