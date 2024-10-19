@@ -164,16 +164,16 @@ Revisión Manual.
 
 ***
 
-# Título: Nombre del error
+# Título:
 La variable `string private s_password;` no es privada
 
-## Summary: ¿Qué ocurre?
+## Summary: 
 
 Lo que ocurre es que en el contrato `PasswordStore` el owner puede configurar su contraseña en la función `PasswordStore:setPassword`  y despúes esta variable de estado se guarda en `string private s_password;` el problema, es que en la blockchain toda la información es accesible.
 
 > [LinkCódigo](https://github.com/xisco-correa/My-Audits/blob/main/audits/PasswordStore/PasswordStore.sol#L14) 
 
-## Vulnerability Details: En que parte del código ocurre y como el usuario explota la vulnerabilidad
+## Vulnerability Details: 
 
 El error del código lo encontramos donde se guarda la contraseña en la variable de estado:
 
@@ -189,6 +189,12 @@ El problema ocurre porque las variables de estado se pueden consultar en la bloc
 
 La manera para extraer esta información se puede hacer con las siguientes dos funciones. La primera función permite sacar la longitud de bytes de la contraseña, esto es necesario para despúes saber que longitud tiene el array de Bytes. En la segunda función copiamos la cadena de bytes32 donde está la contraseña dentro del array de bytes personalizado para despúes poder convertirlo a una variable ***string***.
 
+## Impact: 
+
+Nadie debería guardar una información privada en la blockchain. Ya que esta puede ser solicitada.
+
+## PoC: 
+Si ejecutas estas funciones en un entorno test en foundry con las herramientas de forge-std verás como se puede exploitear:
 ```Solidity
 function GetNumberOfBytesPassword() public returns (uint256) {
         uint256 slot = 2;  // Slot de almacenamiento para el string (ajustado según el contrato PasswordStore)
@@ -229,17 +235,10 @@ function GetNumberOfBytesPassword() public returns (uint256) {
 
 ```
 
-## Impact: ¿Porque esto no debería ser así?
-
-Nadie debería guardar una información privada en la blockchain.
-
-## PoC: funciónes necesarias para testearlo
-
-
-## Tools Used: ¿Qué herramienta has utilizado
+## Tools Used: 
 
 Revisión Manual
 
-## Recommendations: Soluciona el código
+## Recommendations: 
 
 No hay una manera de arreglar que una variable sea oculta para todos, esto es por como funciona la blockchain.
