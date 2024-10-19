@@ -164,7 +164,7 @@ Revisión Manual.
 
 ***
 
-# La variable `string private s_password;` no es privada
+# 03-.La variable `string private s_password;` no es privada
 
 ## Summary
 
