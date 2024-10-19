@@ -161,3 +161,85 @@ Como puedes ver en el `PasswordStore::constructor()` pasa el `msg.sender`al cons
 ## Tools Used
 
 Revisión Manual.
+
+***
+
+# Título: Nombre del error
+La variable `string private s_password;` no es privada
+
+## Summary: ¿Qué ocurre?
+
+Lo que ocurre es que en el contrato `PasswordStore` el owner puede configurar su contraseña en la función `PasswordStore:setPassword`  y despúes esta variable de estado se guarda en `string private s_password;` el problema, es que en la blockchain toda la información es accesible.
+
+> [LinkCódigo](https://github.com/xisco-correa/My-Audits/blob/main/audits/PasswordStore/PasswordStore.sol#L14) 
+
+## Vulnerability Details: En que parte del código ocurre y como el usuario explota la vulnerabilidad
+
+El error del código lo encontramos donde se guarda la contraseña en la variable de estado:
+
+```Solidity
+string private s_password;
+
+function setPassword(string memory newPassword) external {
+        s_password = newPassword;
+        emit SetNetPassword();
+    }
+```
+El problema ocurre porque las variables de estado se pueden consultar en la blockchain. Conociendo el slot de la variable se puede apuntar al contrato para sacar la cadena de bytes32 que guarda esta información y asi extraer la contraseña.
+
+La manera para extraer esta información se puede hacer con las siguientes dos funciones. La primera función permite sacar la longitud de bytes de la contraseña, esto es necesario para despúes saber que longitud tiene el array de Bytes. En la segunda función copiamos la cadena de bytes32 donde está la contraseña dentro del array de bytes personalizado para despúes poder convertirlo a una variable ***string***.
+
+```Solidity
+function GetNumberOfBytesPassword() public returns (uint256) {
+        uint256 slot = 2;  // Slot de almacenamiento para el string (ajustado según el contrato PasswordStore)
+        bytes32 passwordInBytes = vm.load(address(passwordStore), bytes32(slot));
+        
+        uint i = 0;
+        uint256 contadorDeBytes = 0;
+        while(i<32 && passwordInBytes[i]!=0){
+            i++;
+            contadorDeBytes++;
+        
+        }
+        return contadorDeBytes;
+    }
+
+    function testGetPassword() public returns (string memory){
+        uint256 slot = 2;  // Slot de almacenamiento para el string (ajustado según el contrato PasswordStore)
+        bytes32 passwordInBytes = vm.load(address(passwordStore), bytes32(slot));
+        uint256 nuevoContadorDeBytes = 0;
+        uint256 i = 0;
+        bytes memory arrayDeBytes = new bytes(11);
+
+        while( i<32 && nuevoContadorDeBytes < arrayDeBytes.length){
+            bytes32 passwordInBytes = vm.load(address(passwordStore), bytes32(slot));
+            for(i = 0; i<32 && nuevoContadorDeBytes < arrayDeBytes.length; i++){
+                
+                arrayDeBytes[nuevoContadorDeBytes] = passwordInBytes[i];
+                nuevoContadorDeBytes++;
+            }
+            
+            return string(arrayDeBytes);
+
+        }
+
+
+
+    }
+
+```
+
+## Impact: ¿Porque esto no debería ser así?
+
+Nadie debería guardar una información privada en la blockchain.
+
+## PoC: funciónes necesarias para testearlo
+
+
+## Tools Used: ¿Qué herramienta has utilizado
+
+Revisión Manual
+
+## Recommendations: Soluciona el código
+
+No hay una manera de arreglar que una variable sea oculta para todos, esto es por como funciona la blockchain.
